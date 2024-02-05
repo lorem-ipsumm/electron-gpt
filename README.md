@@ -10,5 +10,5 @@ Setup instructions coming soon.
 
 ## References
 
-[Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate)
-[Ollama](https://github.com/ollama/ollama)
+ - [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate)
+ - [Ollama](https://github.com/ollama/ollama)
