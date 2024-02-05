@@ -1,4 +1,4 @@
-![Demo](./readme-assets/demo.gif)
+![Demo](./readme-assets/demo.png)
 
 # Ollama + Electron Desktop AI Assistant
 
