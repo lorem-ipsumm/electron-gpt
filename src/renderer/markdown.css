@@ -34,7 +34,6 @@
 
 .markdown-content pre {
   position: relative;
-  background-color: #282c34;
   color: #abb2bf;
   border-radius: 5px;
   z-index: 1;
@@ -49,11 +48,11 @@
   padding: 10px;
   display: block;
   border-radius: 5px;
-  margin: 20px 0;
+  margin-bottom: 10px;
+  border: 1px solid #2d2d2d;
   font-family: monospace;
   font-size: 15px;
   overflow-x: auto;
-  box-shadow: 0 0 10px 5px rgba(0,0,0, 0.4);
 }
 
 .markdown-content img {
