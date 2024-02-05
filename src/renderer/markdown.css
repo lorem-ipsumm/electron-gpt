@@ -1,0 +1,96 @@
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  color: #e6c07b;
+  margin: 10px 0;
+}
+
+.markdown-content h2 {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.markdown-content h3 {
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.markdown-content a {
+  color: #61afef;
+}
+
+.markdown-content a:hover {
+  color: #56b6c2;
+}
+
+.markdown-content blockquote {
+  color: #98c379;
+  border-left: 0.25em solid rgb(59, 130, 246);
+  padding-left: 10px;
+}
+
+.markdown-content pre {
+  position: relative;
+  background-color: #282c34;
+  color: #abb2bf;
+  border-radius: 5px;
+  z-index: 1;
+}
+
+.markdown-content code {
+  background-color: #1d1c1d !important;
+}
+
+.markdown-content pre>code {
+  color: #c0c0c0;
+  padding: 10px;
+  display: block;
+  border-radius: 5px;
+  margin: 20px 0;
+  font-family: monospace;
+  font-size: 15px;
+  overflow-x: auto;
+  box-shadow: 0 0 10px 5px rgba(0,0,0, 0.4);
+}
+
+.markdown-content img {
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px 5px rgba(0,0,0, 0.4);
+  border-radius: 10px;
+}
+
+.markdown-content p {
+  margin-bottom: 10px;
+}
+
+.markdown-content hr {
+  margin: 20px 0;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 1.5em;
+  margin: 10px 0;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5em;
+}
+
+.markdown-content ul li {
+  list-style-type: disc;
+}
+
+.markdown-content ol li {
+  list-style: decimal;
+}
+
+.markdown-content .linenumber {
+  min-width: 2.5em !important;
+  color: rgb(79, 75, 79) !important;
+}
