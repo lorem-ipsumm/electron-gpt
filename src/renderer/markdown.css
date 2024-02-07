@@ -37,6 +37,8 @@
   color: #abb2bf;
   border-radius: 5px;
   z-index: 1;
+  max-width: 80vw;
+  overflow-x: auto;
 }
 
 .markdown-content code {

@@ -1,0 +1,1 @@
+export const OLLAMA_SERVER_ADDRESS = "http://localhost:8000";
