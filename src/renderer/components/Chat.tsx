@@ -52,8 +52,12 @@ export default function Chat() {
         if (value) {
           const text = new TextDecoder('utf-8').decode(value);
           const data = JSON.parse(text);
-          const { done: isDone, message } = data;
-          fullResponse += message.content;
+          // const { done: isDone, message } = data;
+          const isDone = data.done;
+          const partialResponse = chatType === 'chat'
+            ? data.message.content 
+            : data.response;
+          fullResponse += partialResponse;
           assistantResponse.content = fullResponse;
           // replace the last message with the new message
           messagesRef.current[messagesRef.current.length - 1] =
@@ -67,6 +71,42 @@ export default function Chat() {
     }
     setPending(false);
   };
+
+  const formatRequest = async () => {
+    // get the server address from the environment variables
+    const addr = window.envVars.OLLAMA_SERVER_ADDRESS || "http://localhost:11434";
+    // store the user input before clearing
+    const userInput = input;
+    // clear input
+    setInput('');
+    // setup request body based on chat type
+    let body = {};
+    if (chatType === 'chat') {
+      body = {
+        model: currentModelName,
+        messages: messagesRef.current.map((message) => {
+          return {
+            role: message.role,
+            content: message.content,
+          };
+        }),
+      }
+    } else {
+      body = {
+        model: currentModelName,
+        prompt: userInput 
+      }
+    }
+    // request a response from the assistant
+    const response = await fetch(`${addr}/api/${chatType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    return response;
+  }
 
   const sendMessage = async () => {
     if (!input) return;
@@ -86,26 +126,8 @@ export default function Chat() {
         timestamp: Date.now(),
       },
     ];
-    // clear input
-    setInput('');
-    const addr = window.envVars.OLLAMA_SERVER_ADDRESS || "http://localhost:11434";
     // request a response from the assistant
-    const response = await fetch(`${addr}/api/${chatType}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: currentModelName,
-        messages: messagesRef.current.map((message) => {
-          return {
-            role: message.role,
-            content: message.content,
-          };
-        }),
-      }),
-    });
-
+    const response = await formatRequest();
     // stream the response
     await streamResponse(response);
   };

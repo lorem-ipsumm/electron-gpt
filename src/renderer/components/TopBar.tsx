@@ -43,9 +43,12 @@ export default function TopBar() {
       setIsModelsDropdownOpen(false);
     };
 
+    // filter out the current model from the dropdown
+    const filteredModels = models.filter((model) => model.name !== currentModelName);
+
     return (
-      <div className="z-10 absolute top-[100%] left-0 w-full h-auto bg-zinc-800 text-white items-center justify-end shadow-lg">
-        {models.map((model, index) => {
+      <div className="z-10 absolute top-[120%] left-1/2 w-[70%] h-auto bg-zinc-800 text-white items-center justify-end shadow-lg -translate-x-1/2 rounded-md overflow-hidden">
+        {filteredModels.map((model, index) => {
           return (
             <button
               key={index}
@@ -60,37 +63,30 @@ export default function TopBar() {
     );
   };
 
-  const renderModelButton = () => {
-    const openStyle = isModelsDropdownOpen ? 'bg-zinc-700' : '';
-    return (
-      <>
-        <Menu 
-          className="z-10 absolute left-3 top-1/2 translate-y-[-50%] text-blue-400 cursor-pointer"
-          size={15}
-          onClick={() => setIsSidebarOpen(true)}
-        />
-        <RefreshCw
-          className="z-10 absolute right-3 top-1/2 translate-y-[-50%] text-blue-400 cursor-pointer"
-          size={15}
-          onClick={() => {
-            // trigger page refresh
-            window.location.reload();
-          }}
-        />
-        <button
-          className={`relative min-w-full h-full max-w-80 hover:bg-zinc-700 flex justify-center transition all flex items-center ${openStyle}`}
-          onClick={() => setIsModelsDropdownOpen(!isModelsDropdownOpen)}
-        >
-          {currentModelName}
-        </button>
-        {renderModelsDropdown()}
-      </>
-    );
-  };
+  const iconStyle = "text-blue-400 cursor-pointer"
 
   return (
-    <div className="z-10 absolute top-0 left-0 w-full flex h-[30px] bg-zinc-800 text-white items-center justify-center shadow-xl">
-      {renderModelButton()}
+    <div className="absolute top-0 left-0 w-full h-[30px] bg-zinc-800 flex justify-between items-center px-3">
+      <Menu 
+        className={iconStyle}
+        size={15}
+        onClick={() => setIsSidebarOpen(true)}
+      />
+      <button
+        className={`relative h-4/5 w-auto px-5 hover:bg-zinc-700 flex justify-center transition all flex items-center text-white rounded-md`}
+        onClick={() => setIsModelsDropdownOpen(!isModelsDropdownOpen)}
+      >
+        {currentModelName}
+      </button>
+      <RefreshCw
+        className={iconStyle}
+        size={15}
+        onClick={() => {
+          // trigger page refresh
+          window.location.reload();
+        }}
+      />
+      {renderModelsDropdown()}
     </div>
   );
 }
