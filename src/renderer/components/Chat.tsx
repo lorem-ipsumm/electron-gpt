@@ -3,14 +3,17 @@ import { MESSAGE } from '../utils/interfaces';
 import MessageContainer from './MessageContainer';
 import TopBar from './TopBar';
 import { useAtom } from 'jotai';
-import { currentModelNameAtom } from '../utils/atoms';
+import { chatTypeAtom, currentModelNameAtom } from '../utils/atoms';
 import { useInterval } from 'usehooks-ts';
-import { OLLAMA_SERVER_ADDRESS } from '../utils/utils';
+import Sidebar from './Sidebar';
+let window: any = global;
 
 export default function Chat() {
   const [currentModelName] = useAtom(currentModelNameAtom);
+  const [chatType] = useAtom(chatTypeAtom);
 
   const [input, setInput] = useState<string>('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [pending, setPending] = useState<boolean>(false);
   const [_, forceUpdate] = useState<number>(0);
 
@@ -85,8 +88,9 @@ export default function Chat() {
     ];
     // clear input
     setInput('');
+    const addr = window.envVars.OLLAMA_SERVER_ADDRESS || "http://localhost:11434";
     // request a response from the assistant
-    const response = await fetch(`${OLLAMA_SERVER_ADDRESS}/api/chat`, {
+    const response = await fetch(`${addr}/api/${chatType}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -130,7 +134,6 @@ export default function Chat() {
   };
 
   const renderMessagesContainer = () => {
-    console.log(messagesRef.current);
     return (
       <div
         className="overflow-y-auto text-white min-h-full flex flex-col gap-1 pt-8"
@@ -146,6 +149,7 @@ export default function Chat() {
   return (
     <div className="w-screen min-h-screen max-h-screen flex flex-col p-3 gap-3 bg-zinc-900 justify-between">
       <TopBar />
+      <Sidebar />
       {renderMessagesContainer()}
       {renderInput()}
     </div>

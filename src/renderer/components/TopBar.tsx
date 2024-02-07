@@ -1,13 +1,16 @@
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { currentModelNameAtom } from '../utils/atoms';
+import { currentModelNameAtom, isSidebarOpenAtom } from '../utils/atoms';
 import { MODEL } from '../utils/interfaces';
 import { Menu, RefreshCw } from 'react-feather';
-import { OLLAMA_SERVER_ADDRESS } from '../utils/utils';
+let window: any = global;
 
 export default function TopBar() {
-  const [models, setModels] = useState<MODEL[]>([]);
+
+  const [, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
   const [currentModelName, setCurrentModelName] = useAtom(currentModelNameAtom);
+
+  const [models, setModels] = useState<MODEL[]>([]);
   const [isModelsDropdownOpen, setIsModelsDropdownOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -15,8 +18,9 @@ export default function TopBar() {
   }, []);
 
   const getModels = async () => {
+    const addr = window.envVars.OLLAMA_SERVER_ADDRESS || "http://localhost:11434";
     // fetch the models from the server
-    const response = await fetch(`${OLLAMA_SERVER_ADDRESS}/api/tags`, {
+    const response = await fetch(`${addr}/api/tags`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -63,7 +67,7 @@ export default function TopBar() {
         <Menu 
           className="z-10 absolute left-3 top-1/2 translate-y-[-50%] text-blue-400 cursor-pointer"
           size={15}
-          onClick={() => setIsModelsDropdownOpen(!isModelsDropdownOpen)}
+          onClick={() => setIsSidebarOpen(true)}
         />
         <RefreshCw
           className="z-10 absolute right-3 top-1/2 translate-y-[-50%] text-blue-400 cursor-pointer"
