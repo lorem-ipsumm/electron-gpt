@@ -2,8 +2,8 @@ import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { currentModelNameAtom } from '../utils/atoms';
 import { MODEL } from '../utils/interfaces';
+import { Menu, RefreshCw } from 'react-feather';
 import { OLLAMA_SERVER_ADDRESS } from '../utils/utils';
-import { Menu } from 'react-feather';
 
 export default function TopBar() {
   const [models, setModels] = useState<MODEL[]>([]);
@@ -57,16 +57,26 @@ export default function TopBar() {
   };
 
   const renderModelButton = () => {
+    const openStyle = isModelsDropdownOpen ? 'bg-zinc-700' : '';
     return (
       <>
+        <Menu 
+          className="z-10 absolute left-3 top-1/2 translate-y-[-50%] text-blue-400 cursor-pointer"
+          size={15}
+          onClick={() => setIsModelsDropdownOpen(!isModelsDropdownOpen)}
+        />
+        <RefreshCw
+          className="z-10 absolute right-3 top-1/2 translate-y-[-50%] text-blue-400 cursor-pointer"
+          size={15}
+          onClick={() => {
+            // trigger page refresh
+            window.location.reload();
+          }}
+        />
         <button
-          className="relative min-w-full h-full max-w-80 hover:bg-zinc-700 flex justify-center transition all flex items-center"
+          className={`relative min-w-full h-full max-w-80 hover:bg-zinc-700 flex justify-center transition all flex items-center ${openStyle}`}
           onClick={() => setIsModelsDropdownOpen(!isModelsDropdownOpen)}
         >
-        <Menu 
-          className="absolute left-0 top-1/2 translate-x-2 translate-y-[-50%]"
-          size={15}
-        />
           {currentModelName}
         </button>
         {renderModelsDropdown()}
