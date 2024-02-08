@@ -60,7 +60,7 @@ export default function Sidebar() {
 
     return (
       <div className="w-full flex flex-col gap-4">
-        {slider("Temperature", 0, 1, 0.1, temperature, setTemperature)}
+        {slider("Temperature", 0, 5, 0.1, temperature, setTemperature)}
         {slider("Top P", 0, 1, 0.1, topP, setTopP)}
         {slider("Repeat Penalty", 0, 2, 0.1, repeatPenalty, setRepeatPenalty)}
       </div>

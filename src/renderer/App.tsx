@@ -2,12 +2,8 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Chat from './components/Chat';
 import { useEffect } from 'react';
-import { useAtom } from 'jotai';
-import { isSidebarOpenAtom } from './utils/atoms';
 
 export default function App() {
-
-  const [, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
 
   useEffect(() => {
     const refresh = (e: KeyboardEvent) => {

@@ -11,7 +11,7 @@ export const chatTypeAtom = atom<"chat" | "generate">("chat");
 export const isSidebarOpenAtom = atom<boolean>(false);
 // options for the model
 export const modelOptionsAtom = atom<MODEL_OPTIONS>({
-  temperature: 0.7,
+  temperature: 0.8,
   top_p: 0.9,
   repeat_penalty: 1.1
 })
