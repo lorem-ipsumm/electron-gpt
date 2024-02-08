@@ -2,6 +2,11 @@ import { CONVERSATION, MESSAGE } from "./interfaces";
 
 export const deleteConversation = (uid: string) => {
   const conversations = [...loadConversations()];
+  // if the user is deleting the last conversation, remove the conversations key from local storage
+  if (conversations.length === 1) {
+    localStorage.removeItem('conversations');
+    return;
+  }
   // find the conversation with the passed in uid
   const index = conversations.findIndex((c: any) => c.uid === uid);
   // if the conversation exists delete it from the array

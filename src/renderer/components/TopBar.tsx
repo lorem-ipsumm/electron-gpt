@@ -22,19 +22,23 @@ export default function TopBar() {
   }, []);
 
   const getModels = async () => {
-    const addr =
-      window.envVars.OLLAMA_SERVER_ADDRESS || 'http://localhost:11434';
-    // fetch the models from the server
-    const response = await fetch(`${addr}/api/tags`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const data = await response.json();
-    // set the models
-    setModels(data.models);
-    setCurrentModelName(data.models[0].name);
+    try {
+      const addr =
+        window.envVars.OLLAMA_SERVER_ADDRESS || 'http://localhost:11434';
+      // fetch the models from the server
+      const response = await fetch(`${addr}/api/tags`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      // set the models
+      setModels(data.models);
+      setCurrentModelName(data.models[0].name);
+    } catch (e) {
+      console.log("failed to load models");
+    }
   };
 
   const renderModelsDropdown = () => {
@@ -100,9 +104,9 @@ export default function TopBar() {
       />
       <button
         className={`relative h-4/5 w-auto px-5 hover:bg-zinc-700 flex justify-center transition all flex items-center text-white rounded-md`}
-        onClick={() => setIsModelsDropdownOpen(!isModelsDropdownOpen)}
+        onClick={() => models.length > 0 && setIsModelsDropdownOpen(!isModelsDropdownOpen)}
       >
-        {currentModelName}
+        {currentModelName || "No Models Available"}
       </button>
       <Settings
         className={iconStyle}

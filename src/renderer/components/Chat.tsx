@@ -11,6 +11,7 @@ import {
 } from '../utils/atoms';
 import { useInterval } from 'usehooks-ts';
 import { createConversation, updateConversation } from '../utils/conversationManager';
+import { BounceLoader } from 'react-spinners';
 let window: any = global;
 
 export default function Chat() {
@@ -57,7 +58,7 @@ export default function Chat() {
         }
       }
     },
-    pending ? 500 : null,
+    pending ? 100 : null,
   );
 
   const scrollToBottom = () => {
@@ -65,7 +66,6 @@ export default function Chat() {
   };
 
   const streamResponse = async (stream: Response) => {
-    setPending(true);
     let done = false;
     // get the reader from the response body
     const reader = stream.body?.getReader();
@@ -100,7 +100,6 @@ export default function Chat() {
         done = streamDone;
       } catch (e) {}
     }
-    setPending(false);
   };
 
   const formatRequest = async () => {
@@ -143,45 +142,51 @@ export default function Chat() {
   };
 
   const sendMessage = async () => {
-    if (!input) return;
-    const newMessage: MESSAGE = {
-      role: 'user',
-      content: input,
-      timestamp: Date.now(),
-    };
-    // add the new message to the messages array
-    messagesRef.current = [
-      ...messagesRef.current,
-      newMessage,
-      {
-        role: 'assistant',
-        content: '',
+    try {
+      setPending(true);
+      if (!input) return;
+      const newMessage: MESSAGE = {
+        role: 'user',
+        content: input,
         timestamp: Date.now(),
-      },
-    ];
-    // create a new conversation if there are no messages
-    let conversationUid;
-    if (messagesRef.current.length === 2) {
-      const newConversation = createConversation(
-        messagesRef.current, 
-        currentModelName as string
-      );
-      setCurrentConversation(newConversation);
-      console.log(newConversation);
-      conversationUid = newConversation.uid;
-    } else {
-      conversationUid = currentConversation?.uid;
+      };
+      // add the new message to the messages array
+      messagesRef.current = [
+        ...messagesRef.current,
+        newMessage,
+        {
+          role: 'assistant',
+          content: '',
+          timestamp: Date.now(),
+        },
+      ];
+      // create a new conversation if there are no messages
+      let conversationUid;
+      if (messagesRef.current.length === 2) {
+        const newConversation = createConversation(
+          messagesRef.current, 
+          currentModelName as string
+        );
+        setCurrentConversation(newConversation);
+        console.log(newConversation);
+        conversationUid = newConversation.uid;
+      } else {
+        conversationUid = currentConversation?.uid;
+      }
+      // request a response from the assistant
+      const response = await formatRequest();
+      // stream the response
+      await streamResponse(response);
+      // update the conversation local storage
+      updateConversation(conversationUid as string, messagesRef.current)
+    } catch (e) {
+      console.log(e);
     }
-    // request a response from the assistant
-    const response = await formatRequest();
-    // stream the response
-    await streamResponse(response);
-    // update the conversation local storage
-    updateConversation(conversationUid as string, messagesRef.current)
+    setPending(false);
   };
 
   const keyDown = (e: any) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !pending) {
       sendMessage();
       setTimeout(() => {
         scrollToBottom();
@@ -191,14 +196,22 @@ export default function Chat() {
 
   const renderInput = () => {
     return (
-      <div>
+      <div className="relative w-full">
         <input
           className="w-full h-12 border-[1px] border-zinc-700 min-h-10 px-3 rounded-md bg-zinc-800 text-white outline-zinc-900"
-          placeholder="Type a message..."
+          disabled={!currentModelName}
+          placeholder={`${!currentModelName ? "No model selected" :  "Type a message..."}`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={keyDown}
         />
+        {pending &&
+          <BounceLoader
+            className="!absolute right-3 top-1/2 transform -translate-y-1/2"
+            size={20}
+            color='rgb(96 165 250)'
+          />
+        }
       </div>
     );
   };
