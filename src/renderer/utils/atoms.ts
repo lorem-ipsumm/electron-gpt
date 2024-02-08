@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { MODEL } from "./interfaces";
+import { MODEL, MODEL_OPTIONS } from "./interfaces";
 
 // the name of the current model
 export const currentModelNameAtom = atom<string | null>(null);
@@ -9,3 +9,9 @@ export const modelsAtom = atom<MODEL[]>([]);
 export const chatTypeAtom = atom<"chat" | "generate">("chat");
 // is the sidebar open
 export const isSidebarOpenAtom = atom<boolean>(false);
+// options for the model
+export const modelOptionsAtom = atom<MODEL_OPTIONS>({
+  temperature: 0.7,
+  top_p: 0.9,
+  repeat_penalty: 1.1
+})

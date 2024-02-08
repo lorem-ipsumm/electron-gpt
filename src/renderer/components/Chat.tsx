@@ -3,7 +3,11 @@ import { MESSAGE } from '../utils/interfaces';
 import MessageContainer from './MessageContainer';
 import TopBar from './TopBar';
 import { useAtom } from 'jotai';
-import { chatTypeAtom, currentModelNameAtom } from '../utils/atoms';
+import {
+  chatTypeAtom,
+  currentModelNameAtom,
+  modelOptionsAtom,
+} from '../utils/atoms';
 import { useInterval } from 'usehooks-ts';
 import Sidebar from './Sidebar';
 let window: any = global;
@@ -11,6 +15,7 @@ let window: any = global;
 export default function Chat() {
   const [currentModelName] = useAtom(currentModelNameAtom);
   const [chatType] = useAtom(chatTypeAtom);
+  const [modelOptions] = useAtom(modelOptionsAtom);
 
   const [input, setInput] = useState<string>('');
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
@@ -22,8 +27,17 @@ export default function Chat() {
 
   useInterval(
     () => {
-      // scroll to the bottom of the messages container
-      scrollToBottom();
+      if (containerRef.current) {
+        // check if the user is scrolled to the bottom of the messages container
+        const isScrolledToBottom =
+          containerRef.current?.scrollHeight -
+            containerRef.current?.scrollTop -
+            containerRef.current?.clientHeight <= 100;
+        // scroll to the bottom of the messages container if the user is already at the bottom
+        if (isScrolledToBottom) {
+          scrollToBottom();
+        }
+      }
     },
     pending ? 500 : null,
   );
@@ -54,9 +68,8 @@ export default function Chat() {
           const data = JSON.parse(text);
           // const { done: isDone, message } = data;
           const isDone = data.done;
-          const partialResponse = chatType === 'chat'
-            ? data.message.content 
-            : data.response;
+          const partialResponse =
+            chatType === 'chat' ? data.message.content : data.response;
           fullResponse += partialResponse;
           assistantResponse.content = fullResponse;
           // replace the last message with the new message
@@ -74,7 +87,8 @@ export default function Chat() {
 
   const formatRequest = async () => {
     // get the server address from the environment variables
-    const addr = window.envVars.OLLAMA_SERVER_ADDRESS || "http://localhost:11434";
+    const addr =
+      window.envVars.OLLAMA_SERVER_ADDRESS || 'http://localhost:11434';
     // store the user input before clearing
     const userInput = input;
     // clear input
@@ -88,14 +102,16 @@ export default function Chat() {
           return {
             role: message.role,
             content: message.content,
+            options: modelOptions,
           };
         }),
-      }
+      };
     } else {
       body = {
         model: currentModelName,
-        prompt: userInput 
-      }
+        prompt: userInput,
+        options: modelOptions,
+      };
     }
     // request a response from the assistant
     const response = await fetch(`${addr}/api/${chatType}`, {
@@ -106,7 +122,7 @@ export default function Chat() {
       body: JSON.stringify(body),
     });
     return response;
-  }
+  };
 
   const sendMessage = async () => {
     if (!input) return;

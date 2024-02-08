@@ -1,18 +1,77 @@
 import { useAtom } from "jotai"
-import { chatTypeAtom, isSidebarOpenAtom } from "../utils/atoms"
+import { chatTypeAtom, isSidebarOpenAtom, modelOptionsAtom } from "../utils/atoms"
 import { X } from "react-feather";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
 
   const [chatType, setChatType] = useAtom(chatTypeAtom);
   const [isSidebarOpen, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
+  const [modelOptions, setModelOptions] = useAtom(modelOptionsAtom);
+
+  const [temperature, setTemperature] = useState<number>(modelOptions.temperature);
+  const [repeatPenalty, setRepeatPenalty] = useState<number>(modelOptions.repeat_penalty);
+  const [topP, setTopP] = useState<number>(modelOptions.top_p);
+
+  useEffect(() => {
+    // set the model options
+    setModelOptions({
+      temperature,
+      repeat_penalty: repeatPenalty,
+      top_p: topP
+    });
+  }, [temperature, repeatPenalty, topP]);
+
+  const renderSliders = () => {
+
+    const slider = (
+      label: string,
+      min: number,
+      max: number,
+      step: number,
+      value: number,
+      onChange: (value: number) => void
+    ) => {
+      return (
+        <div className="w-full">
+          <div
+            className="flex justify-between text-white text-sm font-bold mb-2"
+          >
+            <span>
+              {label}
+            </span>
+            <span>
+              {value}
+            </span>
+          </div>
+          <input 
+            type="range" 
+            min={min} 
+            max={max} 
+            step={step} 
+            value={value}
+            onChange={(e) => onChange(parseFloat(e.target.value))}
+            className="w-full dark bg-zinc-900 h-3 rounded-md appearance-none" 
+          />
+        </div>
+      )
+    }
+
+    return (
+      <div className="w-full flex flex-col gap-4">
+        {slider("Temperature", 0, 1, 0.1, temperature, setTemperature)}
+        {slider("Top P", 0, 1, 0.1, topP, setTopP)}
+        {slider("Repeat Penalty", 0, 2, 0.1, repeatPenalty, setRepeatPenalty)}
+      </div>
+    )
+  }
 
   const renderChatType = () => {
     return (
       <div className="w-full">
         <span
-          className="block text-white text-sm font-bold mb-1 text-nowrap"
+          className="block text-white text-sm font-bold mb-2 text-nowrap"
         >
           Chat Type
         </span>
@@ -43,20 +102,35 @@ export default function Sidebar() {
 
   const getSidebarSize = () => {
     if (isSidebarOpen) {
-      return "w-1/2 px-2";
+      return "w-1/2 px-3";
     } else {
       return "w-0 px-0";
     }
   }
+  
+  // this is a wrapper used to listen for clicks outside of the sidebar
+  const renderScreenWrapper = () => {
+    if (!isSidebarOpen) return null;
+    return (
+      <div 
+        className="z-2 absolute left-0 top-0 w-screen h-screen"
+        onClick={() => setIsSidebarOpen(false)}
+      /> 
+    )
+  }
 
   return (
-    <div className={`absolute top-0 left-0 h-screen ${getSidebarSize()} z-10 bg-zinc-950 overflow-hidden transition-all pt-10 flex flex-col items-center`}>
-      <X
-        className="absolute top-2 left-3 text-blue-400 cursor-pointer"
-        onClick={() => setIsSidebarOpen(false)}
-        size={15}
-      />
-      {renderChatType()}
-    </div>
+    <>
+      {renderScreenWrapper()}
+      <div className={`z-2 absolute top-0 left-0 h-screen ${getSidebarSize()} z-10 bg-zinc-950 overflow-hidden transition-all pt-10 flex flex-col gap-8 items-center`}>
+        <X
+          className="absolute top-2 left-3 text-blue-400 cursor-pointer"
+          onClick={() => setIsSidebarOpen(false)}
+          size={15}
+        />
+        {renderChatType()}
+        {renderSliders()}
+      </div>
+    </>
   )
 }

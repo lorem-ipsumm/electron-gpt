@@ -66,7 +66,7 @@ export default function TopBar() {
   const iconStyle = "text-blue-400 cursor-pointer"
 
   return (
-    <div className="absolute top-0 left-0 w-full h-[30px] bg-zinc-800 flex justify-between items-center px-3">
+    <div className="z-10 absolute top-0 left-0 w-full h-[30px] bg-zinc-800 flex justify-between items-center px-3">
       <Menu 
         className={iconStyle}
         size={15}

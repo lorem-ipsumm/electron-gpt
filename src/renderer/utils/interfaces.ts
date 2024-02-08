@@ -4,6 +4,12 @@ export interface MESSAGE {
   timestamp: number
 }
 
+export interface MODEL_OPTIONS {
+  temperature: number,
+  top_p: number,
+  repeat_penalty: number
+}
+
 export interface MODEL {
   digest: string,
   name: string

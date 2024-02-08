@@ -1,5 +1,5 @@
 import { MESSAGE } from '../utils/interfaces';
-import { Monitor, User } from 'react-feather';
+import { Monitor, User, Zap } from 'react-feather';
 import ReactMarkdown from 'react-markdown';
 import { BeatLoader } from 'react-spinners';
 
@@ -11,12 +11,12 @@ export default function MessageContainer(props: { message: MESSAGE }) {
     const isUser = message.role === 'user';
     // icon sizing and style
     const iconSize = 15;
-    const iconStyle = 'transform translate-y-[7px] text-blue-400';
+    const iconStyle = 'transform translate-y-[5px] text-blue-400';
     // render the icon based on the role
     const icon = isUser ? (
       <User size={iconSize} className={iconStyle} />
     ) : (
-      <Monitor size={iconSize} className={iconStyle} />
+      <Zap size={iconSize} className={iconStyle} />
     );
     return <div className="">{icon}</div>;
   };
@@ -39,7 +39,7 @@ export default function MessageContainer(props: { message: MESSAGE }) {
 
   const renderMessage = () => {
     return (
-      <div className="flex gap-4 items-start">
+      <div className="flex gap-3 items-start">
         {renderIcon()}
         <div className="flex flex-col markdown-content pr-2">
           <span className="font-bold capitalize">{message.role}</span>
