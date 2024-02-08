@@ -4,6 +4,7 @@ import { currentConversationAtom, isConversationsMenuOpenAtom } from '../utils/a
 import { useEffect, useState } from 'react';
 import { deleteConversation, loadConversations } from '../utils/conversationManager';
 import { CONVERSATION } from '../utils/interfaces';
+import { useInterval } from 'usehooks-ts';
 
 export default function ConversationsMenu() {
 
@@ -17,6 +18,12 @@ export default function ConversationsMenu() {
     fetchConversations();
   }, []);
 
+  // fetch conversations on a fixed interval to ensure
+  // that new conversations appear on the list
+  useInterval(() => {
+    fetchConversations();
+  }, 1000);
+
   const fetchConversations = async () => {
     const conversations = await loadConversations();
     setConversations(conversations);
@@ -24,7 +31,7 @@ export default function ConversationsMenu() {
 
   const getMenuSize = () => {
     if (isConversationsMenuOpen) {
-      return 'w-1/2 px-3';
+      return 'w-1/2 md:w-1/4 px-3';
     } else {
       return 'w-0 px-0';
     }

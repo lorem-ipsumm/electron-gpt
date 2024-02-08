@@ -102,7 +102,7 @@ export default function SettingsMenu() {
 
   const getMenuSize = () => {
     if (isSettingsMenuOpen) {
-      return "w-1/2 px-3";
+      return "w-1/2 md:w-1/4 px-3";
     } else {
       return "w-0 px-0";
     }
