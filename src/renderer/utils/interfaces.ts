@@ -4,6 +4,13 @@ export interface MESSAGE {
   timestamp: number
 }
 
+export interface CONVERSATION {
+  uid: string;
+  messages: MESSAGE[];
+  timestamp: number,
+  modelName: string,
+}
+
 export interface MODEL_OPTIONS {
   temperature: number,
   top_p: number,

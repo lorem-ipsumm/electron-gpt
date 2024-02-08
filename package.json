@@ -185,8 +185,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Assistant",
+    "appId": "org.erb.Assistant",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -232,6 +232,7 @@
       "target": [
         "AppImage"
       ],
+      "artifactName": "Assistant.${ext}",
       "category": "Development"
     },
     "directories": {

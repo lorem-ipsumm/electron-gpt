@@ -1,30 +1,48 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MESSAGE } from '../utils/interfaces';
 import MessageContainer from './MessageContainer';
 import TopBar from './TopBar';
 import { useAtom } from 'jotai';
 import {
   chatTypeAtom,
+  currentConversationAtom,
   currentModelNameAtom,
   modelOptionsAtom,
 } from '../utils/atoms';
 import { useInterval } from 'usehooks-ts';
-import Sidebar from './Sidebar';
+import { createConversation, updateConversation } from '../utils/conversationManager';
 let window: any = global;
 
 export default function Chat() {
-  const [currentModelName] = useAtom(currentModelNameAtom);
+
+  const [currentModelName, setCurrentModelName] = useAtom(currentModelNameAtom);
   const [chatType] = useAtom(chatTypeAtom);
   const [modelOptions] = useAtom(modelOptionsAtom);
+  const [currentConversation, setCurrentConversation] = useAtom(currentConversationAtom);
 
   const [input, setInput] = useState<string>('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [pending, setPending] = useState<boolean>(false);
   const [_, forceUpdate] = useState<number>(0);
 
   const messagesRef = useRef<MESSAGE[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    // listen for updates to the current conversation
+    if (currentConversation) {
+      // update messages
+      messagesRef.current = currentConversation.messages;
+      // update selected model
+      setCurrentModelName(currentConversation.modelName);
+    } else {
+      // if a new conversation is selected clear the chat
+      messagesRef.current = [];
+    }
+    // force update the view
+    forceUpdate((prev) => prev + 1);
+  }, [currentConversation]);
+
+  
   useInterval(
     () => {
       if (containerRef.current) {
@@ -126,7 +144,6 @@ export default function Chat() {
 
   const sendMessage = async () => {
     if (!input) return;
-    // create new message from user
     const newMessage: MESSAGE = {
       role: 'user',
       content: input,
@@ -142,10 +159,25 @@ export default function Chat() {
         timestamp: Date.now(),
       },
     ];
+    // create a new conversation if there are no messages
+    let conversationUid;
+    if (messagesRef.current.length === 2) {
+      const newConversation = createConversation(
+        messagesRef.current, 
+        currentModelName as string
+      );
+      setCurrentConversation(newConversation);
+      console.log(newConversation);
+      conversationUid = newConversation.uid;
+    } else {
+      conversationUid = currentConversation?.uid;
+    }
     // request a response from the assistant
     const response = await formatRequest();
     // stream the response
     await streamResponse(response);
+    // update the conversation local storage
+    updateConversation(conversationUid as string, messagesRef.current)
   };
 
   const keyDown = (e: any) => {
@@ -187,7 +219,6 @@ export default function Chat() {
   return (
     <div className="w-screen min-h-screen max-h-screen flex flex-col p-3 gap-3 bg-zinc-900 justify-between">
       <TopBar />
-      <Sidebar />
       {renderMessagesContainer()}
       {renderInput()}
     </div>

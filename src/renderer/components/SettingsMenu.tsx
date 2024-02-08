@@ -1,13 +1,13 @@
 import { useAtom } from "jotai"
-import { chatTypeAtom, isSidebarOpenAtom, modelOptionsAtom } from "../utils/atoms"
+import { chatTypeAtom, isSettingsMenuOpenAtom, modelOptionsAtom } from "../utils/atoms"
 import { X } from "react-feather";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useEffect, useState } from "react";
 
-export default function Sidebar() {
+export default function SettingsMenu() {
 
   const [chatType, setChatType] = useAtom(chatTypeAtom);
-  const [isSidebarOpen, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useAtom(isSettingsMenuOpenAtom);
   const [modelOptions, setModelOptions] = useAtom(modelOptionsAtom);
 
   const [temperature, setTemperature] = useState<number>(modelOptions.temperature);
@@ -100,32 +100,20 @@ export default function Sidebar() {
     )
   }
 
-  const getSidebarSize = () => {
-    if (isSidebarOpen) {
+  const getMenuSize = () => {
+    if (isSettingsMenuOpen) {
       return "w-1/2 px-3";
     } else {
       return "w-0 px-0";
     }
   }
   
-  // this is a wrapper used to listen for clicks outside of the sidebar
-  const renderScreenWrapper = () => {
-    if (!isSidebarOpen) return null;
-    return (
-      <div 
-        className="z-2 absolute left-0 top-0 w-screen h-screen"
-        onClick={() => setIsSidebarOpen(false)}
-      /> 
-    )
-  }
-
   return (
     <>
-      {renderScreenWrapper()}
-      <div className={`z-2 absolute top-0 left-0 h-screen ${getSidebarSize()} z-10 bg-zinc-950 overflow-hidden transition-all pt-10 flex flex-col gap-8 items-center`}>
+      <div className={`z-2 absolute top-0 right-0 h-screen ${getMenuSize()} z-10 bg-zinc-950 overflow-hidden transition-all pt-10 flex flex-col gap-8 items-center shadow-xl`}>
         <X
-          className="absolute top-2 left-3 text-blue-400 cursor-pointer"
-          onClick={() => setIsSidebarOpen(false)}
+          className="absolute top-2 right-3 text-blue-400 cursor-pointer"
+          onClick={() => setIsSettingsMenuOpen(false)}
           size={15}
         />
         {renderChatType()}

@@ -1,24 +1,29 @@
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { currentModelNameAtom, isSidebarOpenAtom } from '../utils/atoms';
+import { currentModelNameAtom, isConversationsMenuOpenAtom, isSettingsMenuOpenAtom } from '../utils/atoms';
 import { MODEL } from '../utils/interfaces';
-import { Menu, RefreshCw } from 'react-feather';
+import { MessageCircle, Settings } from 'react-feather';
+import DialogScreenWrapper from './DialogScreenWrapper';
+import SettingsMenu from './SettingsMenu';
+import ConversationsMenu from './ConversationsMenu';
 let window: any = global;
 
 export default function TopBar() {
-
-  const [, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useAtom(isSettingsMenuOpenAtom);
+  const [isConversationsMenuOpen, setIsConversationsMenuOpen] = useAtom(isConversationsMenuOpenAtom);
   const [currentModelName, setCurrentModelName] = useAtom(currentModelNameAtom);
 
   const [models, setModels] = useState<MODEL[]>([]);
-  const [isModelsDropdownOpen, setIsModelsDropdownOpen] = useState<boolean>(false);
+  const [isModelsDropdownOpen, setIsModelsDropdownOpen] =
+    useState<boolean>(false);
 
   useEffect(() => {
     getModels();
   }, []);
 
   const getModels = async () => {
-    const addr = window.envVars.OLLAMA_SERVER_ADDRESS || "http://localhost:11434";
+    const addr =
+      window.envVars.OLLAMA_SERVER_ADDRESS || 'http://localhost:11434';
     // fetch the models from the server
     const response = await fetch(`${addr}/api/tags`, {
       method: 'GET',
@@ -44,10 +49,12 @@ export default function TopBar() {
     };
 
     // filter out the current model from the dropdown
-    const filteredModels = models.filter((model) => model.name !== currentModelName);
+    const filteredModels = models.filter(
+      (model) => model.name !== currentModelName,
+    );
 
     return (
-      <div className="z-10 absolute top-[120%] left-1/2 w-[70%] h-auto bg-zinc-800 text-white items-center justify-end shadow-lg -translate-x-1/2 rounded-md overflow-hidden">
+      <div className="z-10 absolute top-[130%] left-1/2 w-[70%] h-auto bg-zinc-800 text-white items-center justify-end shadow-lg -translate-x-1/2 rounded-md overflow-hidden">
         {filteredModels.map((model, index) => {
           return (
             <button
@@ -63,14 +70,33 @@ export default function TopBar() {
     );
   };
 
-  const iconStyle = "text-blue-400 cursor-pointer"
+  // this is a wrapper used to listen for clicks outside of the sidebar
+  const iconStyle = 'text-blue-400 cursor-pointer';
+
+  const renderMenus = () => {
+    return (
+      <>
+        <DialogScreenWrapper
+          isDialogOpen={isModelsDropdownOpen || isConversationsMenuOpen || isSettingsMenuOpen}
+          setIsDialogOpen={() => {
+            setIsModelsDropdownOpen(false);
+            setIsConversationsMenuOpen(false);
+            setIsSettingsMenuOpen(false);
+          }}
+        />
+        <SettingsMenu />
+        <ConversationsMenu />
+        {renderModelsDropdown()}
+      </>
+    );
+  };
 
   return (
     <div className="z-10 absolute top-0 left-0 w-full h-[30px] bg-zinc-800 flex justify-between items-center px-3">
-      <Menu 
+      <MessageCircle
         className={iconStyle}
         size={15}
-        onClick={() => setIsSidebarOpen(true)}
+        onClick={() => setIsConversationsMenuOpen(true)}
       />
       <button
         className={`relative h-4/5 w-auto px-5 hover:bg-zinc-700 flex justify-center transition all flex items-center text-white rounded-md`}
@@ -78,15 +104,12 @@ export default function TopBar() {
       >
         {currentModelName}
       </button>
-      <RefreshCw
+      <Settings
         className={iconStyle}
         size={15}
-        onClick={() => {
-          // trigger page refresh
-          window.location.reload();
-        }}
+        onClick={() => setIsSettingsMenuOpen(true)}
       />
-      {renderModelsDropdown()}
+      {renderMenus()}
     </div>
   );
 }
