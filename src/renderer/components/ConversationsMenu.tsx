@@ -1,18 +1,26 @@
-import { PlusCircle, Trash, Trash2, X } from 'react-feather';
+import { Plus, PlusCircle, Trash2, X } from 'react-feather';
 import { useAtom } from 'jotai';
-import { currentConversationAtom, isConversationsMenuOpenAtom } from '../utils/atoms';
+import {
+  currentConversationAtom,
+  isConversationsMenuOpenAtom,
+} from '../utils/atoms';
 import { useEffect, useState } from 'react';
-import { deleteConversation, loadConversations } from '../utils/conversationManager';
+import {
+  deleteAllConversations,
+  deleteConversation,
+  loadConversations,
+} from '../utils/conversationManager';
 import { CONVERSATION } from '../utils/interfaces';
 import { useInterval } from 'usehooks-ts';
 
 export default function ConversationsMenu() {
-
   const [isConversationsMenuOpen, setIsConversationsMenuOpen] = useAtom(
     isConversationsMenuOpenAtom,
   );
   const [conversations, setConversations] = useState<CONVERSATION[]>([]);
-  const [currentConversation, setCurrentConversation] = useAtom(currentConversationAtom);
+  const [currentConversation, setCurrentConversation] = useAtom(
+    currentConversationAtom,
+  );
 
   useEffect(() => {
     fetchConversations();
@@ -27,7 +35,7 @@ export default function ConversationsMenu() {
   const fetchConversations = async () => {
     const conversations = await loadConversations();
     setConversations(conversations);
-  }
+  };
 
   const getMenuSize = () => {
     if (isConversationsMenuOpen) {
@@ -37,37 +45,44 @@ export default function ConversationsMenu() {
     }
   };
 
-  const renderNewConversationButton = () => {
-
-    const onClick = () => {
-      setCurrentConversation(null);
-      setIsConversationsMenuOpen(false);
-    }
-
+  const renderMenuButton = (label: string, icon: any, onClick: () => void) => {
     return (
-      <div 
-        className={`flex justify-between w-full h-10 cursor-pointer items-center hover:bg-zinc-900 px-2 transition all rounded-md text-white border border-zinc-800`}
+      <div
+        className={`flex justify-between w-full h-10 cursor-pointer items-center hover:bg-zinc-900 transition all rounded-md text-white border border-zinc-800`}
         onClick={onClick}
       >
-        <span className="text-nowrap">New Conversation</span>
-        <PlusCircle
-          size={15}
-        />
+        <span className="block h-full flex-1 text-white text-nowrap flex items-center px-2">
+          {label}
+        </span>
+        <div className="h-full w-1/5 flex justify-center items-center">
+          {icon}
+        </div>
       </div>
-    )
-  }
+    );
+  };
+
+  // on click listener for deleting all conversations
+  const deleteAllConversationsClicked = () => {
+    deleteAllConversations();
+    fetchConversations();
+  };
+
+  // on click listener for starting new conversations
+  const newConversationClicked = () => {
+    setCurrentConversation(null);
+    setIsConversationsMenuOpen(false);
+  };
 
   const renderConversations = () => {
-
     const conversationClicked = (conversation: CONVERSATION) => {
       setCurrentConversation(conversation);
       setIsConversationsMenuOpen(false);
-    }
+    };
 
     const deleteClicked = (conversation: CONVERSATION) => {
       deleteConversation(conversation.uid);
       fetchConversations();
-    }
+    };
 
     return (
       <>
@@ -75,30 +90,39 @@ export default function ConversationsMenu() {
           const messages = conversation.messages;
           const firstMessage = messages[0];
           const title = firstMessage.content.substring(0, 15);
-          const isActiveConversation = conversation.uid === currentConversation?.uid;
-          const isActiveStyle = `${isActiveConversation ? "bg-zinc-900" : ""}`
+          const isActiveConversation =
+            conversation.uid === currentConversation?.uid;
+          const isActiveStyle = `${isActiveConversation ? 'bg-zinc-900' : ''}`;
           return (
-            <div 
-              className={`${isActiveStyle} flex justify-between w-full h-10 cursor-pointer items-center hover:bg-zinc-900 px-2 transition all rounded-md`}
+            <div
+              className={`${isActiveStyle} flex justify-between w-full h-10 cursor-pointer items-center hover:bg-zinc-900 transition all rounded-md overflow-hidden`}
               onClick={() => conversationClicked(conversation)}
             >
-              <span 
-                className="text-white text-nowrap"
-              >
+              <span className="block h-full flex-1 text-white text-nowrap flex items-center px-2">
                 {title}
               </span>
-              <Trash2 
-                className="text-red-500 cursor-pointer"
-                size={15}
+              <div
+                className="h-full w-1/5 flex justify-center items-center hover:bg-zinc-800"
                 onClick={() => deleteClicked(conversation)}
-              />
+              >
+                <Trash2 className="text-red-500 cursor-pointer" size={15} />
+              </div>
             </div>
-          )
+          );
         })}
-        {renderNewConversationButton()}
+        {renderMenuButton(
+          'New Conversation',
+          <PlusCircle size={15} />,
+          newConversationClicked,
+        )}
+        {renderMenuButton(
+          'Delete Conversations',
+          <Trash2 size={15} className="text-red-500" />,
+          deleteAllConversationsClicked,
+        )}
       </>
-    )
-  }
+    );
+  };
 
   return (
     <>

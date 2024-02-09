@@ -187,6 +187,7 @@ export default function Chat() {
 
   const keyDown = (e: any) => {
     if (e.key === 'Enter' && !pending) {
+      e.preventDefault();
       sendMessage();
       setTimeout(() => {
         scrollToBottom();
@@ -196,9 +197,9 @@ export default function Chat() {
 
   const renderInput = () => {
     return (
-      <div className="relative w-full">
-        <input
-          className="w-full h-12 border-[1px] border-zinc-700 min-h-10 px-3 rounded-md bg-zinc-800 text-white outline-zinc-900"
+      <div className="relative w-full h-auto flex">
+        <textarea
+          className="w-full h-12 border-[1px] border-zinc-700 min-h-10 px-3 rounded-md bg-zinc-800 text-white outline-zinc-900 pt-[10px] pr-10"
           disabled={!currentModelName}
           placeholder={`${!currentModelName ? "No model selected" :  "Type a message..."}`}
           value={input}
