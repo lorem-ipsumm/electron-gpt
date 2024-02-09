@@ -58,7 +58,7 @@ export default function TopBar() {
     );
 
     return (
-      <div className="z-10 absolute top-[130%] left-1/2 w-[70%] h-auto bg-zinc-800 text-white items-center justify-end shadow-lg -translate-x-1/2 rounded-md overflow-hidden">
+      <div className="z-10 absolute top-[130%] left-1/2 w-[70%] h-auto bg-zinc-800 text-white items-center justify-end shadow-3xl -translate-x-1/2 rounded-md overflow-hidden border border-zinc-700">
         {filteredModels.map((model, index) => {
           return (
             <button

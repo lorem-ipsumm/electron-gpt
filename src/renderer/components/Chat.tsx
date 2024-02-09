@@ -51,7 +51,7 @@ export default function Chat() {
         const isScrolledToBottom =
           containerRef.current?.scrollHeight -
             containerRef.current?.scrollTop -
-            containerRef.current?.clientHeight <= 100;
+            containerRef.current?.clientHeight <= 40;
         // scroll to the bottom of the messages container if the user is already at the bottom
         if (isScrolledToBottom) {
           scrollToBottom();
