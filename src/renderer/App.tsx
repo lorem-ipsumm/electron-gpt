@@ -7,7 +7,7 @@ export default function App() {
 
   useEffect(() => {
     const refresh = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'r') 
+      if (e.ctrlKey && e.key === 'r')
         window.location.reload();
     }
     // create keydown event listener for ctrl + r

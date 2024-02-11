@@ -12,6 +12,7 @@ import {
 import { useInterval } from 'usehooks-ts';
 import { createConversation, updateConversation } from '../utils/conversationManager';
 import { BounceLoader } from 'react-spinners';
+import { getSystemPrompt } from '../utils/utils';
 let window: any = global;
 
 export default function Chat() {
@@ -43,7 +44,7 @@ export default function Chat() {
     forceUpdate((prev) => prev + 1);
   }, [currentConversation]);
 
-  
+
   useInterval(
     () => {
       if (containerRef.current) {
@@ -116,10 +117,12 @@ export default function Chat() {
       body = {
         model: currentModelName,
         messages: messagesRef.current.map((message) => {
+          const systemPrompt = getSystemPrompt(currentModelName as string, message.content);
           return {
             role: message.role,
             content: message.content,
             options: modelOptions,
+            template: getSystemPrompt(currentModelName as string, message.content),
           };
         }),
       };
@@ -128,6 +131,7 @@ export default function Chat() {
         model: currentModelName,
         prompt: userInput,
         options: modelOptions,
+        template: getSystemPrompt(currentModelName as string, userInput),
       };
     }
     // request a response from the assistant
@@ -164,7 +168,7 @@ export default function Chat() {
       let conversationUid;
       if (messagesRef.current.length === 2) {
         const newConversation = createConversation(
-          messagesRef.current, 
+          messagesRef.current,
           currentModelName as string
         );
         setCurrentConversation(newConversation);
