@@ -111,12 +111,12 @@ export default function ConversationsMenu() {
           );
         })}
         {renderMenuButton(
-          'New Conversation',
+          'New Chat',
           <PlusCircle size={15} />,
           newConversationClicked,
         )}
         {renderMenuButton(
-          'Delete Conversations',
+          'Delete All',
           <Trash2 size={15} className="text-red-500" />,
           deleteAllConversationsClicked,
         )}
