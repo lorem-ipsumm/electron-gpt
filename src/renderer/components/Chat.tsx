@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MESSAGE } from '../utils/interfaces';
+import { MESSAGE, SETTINGS } from '../utils/interfaces';
 import MessageContainer from './MessageContainer';
 import TopBar from './TopBar';
 import { useAtom } from 'jotai';
@@ -10,21 +10,27 @@ import {
   modelOptionsAtom,
 } from '../utils/atoms';
 import { useInterval } from 'usehooks-ts';
-import { createConversation, updateConversation } from '../utils/conversationManager';
+import {
+  createConversation,
+  updateConversation,
+} from '../utils/conversationManager';
 import { BounceLoader } from 'react-spinners';
 import { getSystemPrompt } from '../utils/utils';
+import { loadSettings } from '../utils/settingsManager';
 let window: any = global;
 
 export default function Chat() {
-
   const [currentModelName, setCurrentModelName] = useAtom(currentModelNameAtom);
   const [chatType] = useAtom(chatTypeAtom);
   const [modelOptions] = useAtom(modelOptionsAtom);
-  const [currentConversation, setCurrentConversation] = useAtom(currentConversationAtom);
+  const [currentConversation, setCurrentConversation] = useAtom(
+    currentConversationAtom,
+  );
 
   const [input, setInput] = useState<string>('');
   const [pending, setPending] = useState<boolean>(false);
   const [_, forceUpdate] = useState<number>(0);
+  const [checkedSettings, setCheckedSettings] = useState<boolean>(false);
 
   const messagesRef = useRef<MESSAGE[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -44,7 +50,6 @@ export default function Chat() {
     forceUpdate((prev) => prev + 1);
   }, [currentConversation]);
 
-
   useInterval(
     () => {
       if (containerRef.current) {
@@ -52,7 +57,8 @@ export default function Chat() {
         const isScrolledToBottom =
           containerRef.current?.scrollHeight -
             containerRef.current?.scrollTop -
-            containerRef.current?.clientHeight <= 40;
+            containerRef.current?.clientHeight <=
+          40;
         // scroll to the bottom of the messages container if the user is already at the bottom
         if (isScrolledToBottom) {
           scrollToBottom();
@@ -61,6 +67,14 @@ export default function Chat() {
     },
     pending ? 100 : null,
   );
+
+  // const checkSettings = () => {
+  //   const settings = loadSettings() as SETTINGS;
+  //   if (Object.entries(settings).length > 0 && settings.lastConversation) {
+  //     setCurrentConversation(settings.lastConversation);
+  //   }
+  //   setCheckedSettings(true);
+  // };
 
   const scrollToBottom = () => {
     containerRef.current?.scrollTo(0, containerRef.current?.scrollHeight);
@@ -117,12 +131,14 @@ export default function Chat() {
       body = {
         model: currentModelName,
         messages: messagesRef.current.map((message) => {
-          const systemPrompt = getSystemPrompt(currentModelName as string, message.content);
           return {
             role: message.role,
             content: message.content,
             options: modelOptions,
-            template: getSystemPrompt(currentModelName as string, message.content),
+            template: getSystemPrompt(
+              currentModelName as string,
+              message.content,
+            ),
           };
         }),
       };
@@ -169,7 +185,7 @@ export default function Chat() {
       if (messagesRef.current.length === 2) {
         const newConversation = createConversation(
           messagesRef.current,
-          currentModelName as string
+          currentModelName as string,
         );
         setCurrentConversation(newConversation);
         console.log(newConversation);
@@ -182,7 +198,7 @@ export default function Chat() {
       // stream the response
       await streamResponse(response);
       // update the conversation local storage
-      updateConversation(conversationUid as string, messagesRef.current)
+      updateConversation(conversationUid as string, messagesRef.current);
     } catch (e) {
       console.log(e);
     }
@@ -205,18 +221,20 @@ export default function Chat() {
         <textarea
           className="w-full h-12 border-[1px] border-zinc-700 min-h-10 px-3 rounded-md bg-zinc-800 text-white outline-zinc-900 pt-[10px] pr-10"
           disabled={!currentModelName}
-          placeholder={`${!currentModelName ? "No model selected" :  "Type a message..."}`}
+          placeholder={`${
+            !currentModelName ? 'No model selected' : 'Type a message...'
+          }`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={keyDown}
         />
-        {pending &&
+        {pending && (
           <BounceLoader
             className="!absolute right-3 top-1/2 transform -translate-y-1/2"
             size={20}
-            color='rgb(96 165 250)'
+            color="rgb(96 165 250)"
           />
-        }
+        )}
       </div>
     );
   };

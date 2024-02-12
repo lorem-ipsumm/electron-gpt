@@ -4,9 +4,15 @@ export interface MESSAGE {
   timestamp: number
 }
 
+export interface SETTINGS {
+  lastModelName: string,
+  lastConversation: CONVERSATION,
+  modelOptions: MODEL_OPTIONS,
+}
+
 export interface CONVERSATION {
   uid: string;
-  messages: MESSAGE[];
+  messages: MESSAGE[],
   timestamp: number,
   modelName: string,
 }

@@ -2,8 +2,16 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Chat from './components/Chat';
 import { useEffect } from 'react';
+import { useAtom } from 'jotai';
+import { currentConversationAtom, currentModelNameAtom, modelOptionsAtom } from './utils/atoms';
+import { loadSettings, updateSettings } from './utils/settingsManager';
+import { SETTINGS } from './utils/interfaces';
 
 export default function App() {
+
+  const [modelOptions] = useAtom(modelOptionsAtom);
+  const [currentModelName] = useAtom(currentModelNameAtom);
+  const [currentConversation] = useAtom(currentConversationAtom);
 
   useEffect(() => {
     const refresh = (e: KeyboardEvent) => {
@@ -17,6 +25,20 @@ export default function App() {
       window.removeEventListener('keydown', refresh);
     };
   }, []);
+
+  useEffect(() => {
+    // whenever the currentModelName or modelOptions updates
+    // update the settings in local storage
+    const settings = loadSettings();
+    let newSettings:any = {
+      ...settings
+    }
+    if (currentModelName)
+      newSettings.lastModelName = currentModelName;
+    if (currentConversation)
+      newSettings.lastConversation = currentConversation;
+    updateSettings(newSettings);
+  }, [currentModelName, currentConversation]);
 
   return (
     <Router>
