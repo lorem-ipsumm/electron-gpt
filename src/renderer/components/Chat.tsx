@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MESSAGE, SETTINGS } from '../utils/interfaces';
+import { MESSAGE } from '../utils/interfaces';
 import MessageContainer from './MessageContainer';
 import TopBar from './TopBar';
 import { useAtom } from 'jotai';
@@ -13,10 +13,9 @@ import { useInterval } from 'usehooks-ts';
 import {
   createConversation,
   updateConversation,
-} from '../utils/conversationManager';
+} from '../utils/managers/conversationManager';
 import { BounceLoader } from 'react-spinners';
 import { getSystemPrompt } from '../utils/utils';
-import { loadSettings } from '../utils/settingsManager';
 let window: any = global;
 
 export default function Chat() {

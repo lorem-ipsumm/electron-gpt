@@ -1,4 +1,4 @@
-import { CONVERSATION, MESSAGE } from "./interfaces";
+import { CONVERSATION, MESSAGE } from "../interfaces";
 
 export const deleteAllConversations = () => {
   localStorage.removeItem('conversations');

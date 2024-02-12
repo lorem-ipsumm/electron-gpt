@@ -1,20 +1,29 @@
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { currentConversationAtom, currentModelNameAtom, isConversationsMenuOpenAtom, isSettingsMenuOpenAtom } from '../utils/atoms';
+import {
+  currentConversationAtom,
+  currentModelNameAtom,
+  isConversationsMenuOpenAtom,
+  isSettingsMenuOpenAtom,
+} from '../utils/atoms';
 import { MODEL, SETTINGS } from '../utils/interfaces';
 import { MessageCircle, Settings } from 'react-feather';
 import DialogScreenWrapper from './DialogScreenWrapper';
 import SettingsMenu from './SettingsMenu';
 import ConversationsMenu from './ConversationsMenu';
-import { loadSettings } from '../utils/settingsManager';
+import { loadSettings } from '../utils/managers/settingsManager';
 import { Skeleton } from '@/components/ui/skeleton';
 let window: any = global;
 
 export default function TopBar() {
-  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useAtom(isSettingsMenuOpenAtom);
-  const [isConversationsMenuOpen, setIsConversationsMenuOpen] = useAtom(isConversationsMenuOpenAtom);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useAtom(
+    isSettingsMenuOpenAtom,
+  );
+  const [isConversationsMenuOpen, setIsConversationsMenuOpen] = useAtom(
+    isConversationsMenuOpenAtom,
+  );
   const [currentModelName, setCurrentModelName] = useAtom(currentModelNameAtom);
-  const [,setCurrentConversation] = useAtom(currentConversationAtom);
+  const [, setCurrentConversation] = useAtom(currentConversationAtom);
 
   const [loadingModels, setLoadingModels] = useState<boolean>(true);
   const [models, setModels] = useState<MODEL[]>([]);
@@ -26,7 +35,7 @@ export default function TopBar() {
     // use a set timeout to prevent weird flashing behavior
     setTimeout(() => {
       setLoadingModels(false);
-    }, 500)
+    }, 500);
   }, []);
 
   const checkSettings = (models: MODEL[]) => {
@@ -36,7 +45,7 @@ export default function TopBar() {
     } else {
       setCurrentModelName(models[0].name);
     }
-  }
+  };
 
   const getModels = async () => {
     try {
@@ -54,7 +63,7 @@ export default function TopBar() {
       setModels(data.models);
       checkSettings(data.models);
     } catch (e) {
-      console.log("failed to load models");
+      console.log('failed to load models');
     }
   };
 
@@ -100,7 +109,11 @@ export default function TopBar() {
     return (
       <>
         <DialogScreenWrapper
-          isDialogOpen={isModelsDropdownOpen || isConversationsMenuOpen || isSettingsMenuOpen}
+          isDialogOpen={
+            isModelsDropdownOpen ||
+            isConversationsMenuOpen ||
+            isSettingsMenuOpen
+          }
           setIsDialogOpen={() => {
             setIsModelsDropdownOpen(false);
             setIsConversationsMenuOpen(false);
@@ -116,10 +129,9 @@ export default function TopBar() {
 
   const renderCurrentModelName = () => {
     if (loadingModels)
-      return <Skeleton className="w-[100px] h-[15px] rounded-sm bg-zinc-600"/>
-    else 
-      return currentModelName || "No Models Available";
-  }
+      return <Skeleton className="w-[100px] h-[15px] rounded-sm bg-zinc-600" />;
+    else return currentModelName || 'No Models Available';
+  };
 
   return (
     <div className="z-10 absolute top-0 left-0 w-full h-[30px] bg-zinc-800 flex justify-between items-center px-3">
@@ -130,7 +142,9 @@ export default function TopBar() {
       />
       <button
         className={`relative h-4/5 w-auto px-5 hover:bg-zinc-700 flex justify-center transition all flex items-center text-white rounded-md`}
-        onClick={() => models.length > 0 && setIsModelsDropdownOpen(!isModelsDropdownOpen)}
+        onClick={() =>
+          models.length > 0 && setIsModelsDropdownOpen(!isModelsDropdownOpen)
+        }
       >
         {renderCurrentModelName()}
       </button>

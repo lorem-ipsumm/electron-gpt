@@ -1,4 +1,4 @@
-import { Plus, PlusCircle, Trash2, X } from 'react-feather';
+import { PlusCircle, Trash2, X } from 'react-feather';
 import { useAtom } from 'jotai';
 import {
   currentConversationAtom,
@@ -9,7 +9,7 @@ import {
   deleteAllConversations,
   deleteConversation,
   loadConversations,
-} from '../utils/conversationManager';
+} from '../utils/managers/conversationManager';
 import { CONVERSATION } from '../utils/interfaces';
 import { useInterval } from 'usehooks-ts';
 
