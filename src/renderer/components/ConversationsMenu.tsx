@@ -65,6 +65,7 @@ export default function ConversationsMenu() {
   const deleteAllConversationsClicked = () => {
     deleteAllConversations();
     fetchConversations();
+    setCurrentConversation(null);
   };
 
   // on click listener for starting new conversations
