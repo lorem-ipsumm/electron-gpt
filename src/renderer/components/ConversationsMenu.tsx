@@ -22,6 +22,7 @@ export default function ConversationsMenu() {
     currentConversationAtom,
   );
 
+  // fetch conversations on component mount
   useEffect(() => {
     fetchConversations();
   }, []);
@@ -37,7 +38,8 @@ export default function ConversationsMenu() {
     setConversations(conversations);
   };
 
-  const getMenuSize = () => {
+  // style for the menu based on whether it is open or not
+  const menuSizeStyle = () => {
     if (isConversationsMenuOpen) {
       return 'w-1/2 md:w-1/4 px-3';
     } else {
@@ -128,7 +130,7 @@ export default function ConversationsMenu() {
   return (
     <>
       <div
-        className={`z-2 absolute top-0 left-0 h-screen ${getMenuSize()} z-10 bg-zinc-950 overflow-hidden transition-all pt-10 flex flex-col gap-3 items-center shadow-xl`}
+        className={`z-2 absolute top-0 left-0 h-screen ${menuSizeStyle()} z-10 bg-zinc-950 overflow-hidden transition-all pt-10 flex flex-col gap-3 items-center shadow-xl`}
       >
         {renderConversations()}
         <X
