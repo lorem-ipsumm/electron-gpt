@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MESSAGE } from '../utils/interfaces';
+import { MESSAGE, SELECTED_IMAGE } from '../utils/interfaces';
 import MessageContainer from './MessageContainer';
 import TopBar from './TopBar';
 import { useAtom } from 'jotai';
@@ -16,6 +16,8 @@ import {
 } from '../utils/managers/conversationManager';
 import { BounceLoader } from 'react-spinners';
 import { getSystemPrompt } from '../utils/utils';
+import { Image } from 'react-feather';
+import SelectedImages from './SelectedImages';
 let window: any = global;
 
 export default function Chat() {
@@ -29,7 +31,7 @@ export default function Chat() {
   const [input, setInput] = useState<string>('');
   const [pending, setPending] = useState<boolean>(false);
   const [_, forceUpdate] = useState<number>(0);
-  const [checkedSettings, setCheckedSettings] = useState<boolean>(false);
+  const [selectedImages, setSelectedImages] = useState<SELECTED_IMAGE[]>([]);
 
   const messagesRef = useRef<MESSAGE[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,14 +68,6 @@ export default function Chat() {
     },
     pending ? 100 : null,
   );
-
-  // const checkSettings = () => {
-  //   const settings = loadSettings() as SETTINGS;
-  //   if (Object.entries(settings).length > 0 && settings.lastConversation) {
-  //     setCurrentConversation(settings.lastConversation);
-  //   }
-  //   setCheckedSettings(true);
-  // };
 
   const scrollToBottom = () => {
     containerRef.current?.scrollTo(0, containerRef.current?.scrollHeight);
@@ -116,14 +110,20 @@ export default function Chat() {
     }
   };
 
+  const addSelectedImages = () => {
+    if (selectedImages.length === 0) return {};
+    else
+      return {
+        images: selectedImages.map((image) => image.base64),
+      };
+  };
+
   const formatRequest = async () => {
     // get the server address from the environment variables
     const addr =
       window.envVars.OLLAMA_SERVER_ADDRESS || 'http://localhost:11434';
     // store the user input before clearing
     const userInput = input;
-    // clear input
-    setInput('');
     // setup request body based on chat type
     let body = {};
     if (chatType === 'chat') {
@@ -138,6 +138,7 @@ export default function Chat() {
               currentModelName as string,
               message.content,
             ),
+            ...addSelectedImages(),
           };
         }),
       };
@@ -147,8 +148,12 @@ export default function Chat() {
         prompt: userInput,
         options: modelOptions,
         template: getSystemPrompt(currentModelName as string, userInput),
+        ...addSelectedImages(),
       };
     }
+    // clear input
+    setInput('');
+    setSelectedImages([]);
     // request a response from the assistant
     const response = await fetch(`${addr}/api/${chatType}`, {
       method: 'POST',
@@ -168,6 +173,7 @@ export default function Chat() {
         role: 'user',
         content: input,
         timestamp: Date.now(),
+        images: selectedImages,
       };
       // add the new message to the messages array
       messagesRef.current = [
@@ -187,7 +193,6 @@ export default function Chat() {
           currentModelName as string,
         );
         setCurrentConversation(newConversation);
-        console.log(newConversation);
         conversationUid = newConversation.uid;
       } else {
         conversationUid = currentConversation?.uid;
@@ -214,26 +219,73 @@ export default function Chat() {
     }
   };
 
-  const renderInput = () => {
-    return (
-      <div className="relative w-full h-auto flex">
-        <textarea
-          className="w-full h-12 border-[1px] border-zinc-700 min-h-10 px-3 rounded-md bg-zinc-800 text-white outline-zinc-900 pt-[10px] pr-10"
-          disabled={!currentModelName}
-          placeholder={`${
-            !currentModelName ? 'No model selected' : 'Type a message...'
-          }`}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={keyDown}
-        />
-        {pending && (
-          <BounceLoader
-            className="!absolute right-3 top-1/2 transform -translate-y-1/2"
-            size={20}
-            color="rgb(96 165 250)"
+  const isUsingImageModel = () => {
+    return currentModelName === 'llava:latest';
+  };
+
+  const renderImageSelection = () => {
+    // prompt the user to select an image from their computer
+    const selectImage = async () => {
+      // setup listener for a response from the main process
+      window.electron.ipcRenderer.once('image-selected', (newImageData: {
+        base64: string, 
+        path: string
+      }) => {
+        if (newImageData) {
+          setSelectedImages([...selectedImages, newImageData]);
+        }
+      });
+
+      // send a message to the main process to open the file dialog
+      await window.electron.ipcRenderer.sendMessage('select-image', [
+        'select-image',
+      ]);
+    };
+
+    if (isUsingImageModel()) {
+      return (
+        <div
+          className="cursor-pointer text-white opacity-50 hover:opacity-100 transition-all"
+          onClick={selectImage}
+        >
+          <Image
+            className="absolute left-4 top-1/2 transform -translate-y-1/2"
+            size={18}
           />
-        )}
+        </div>
+      );
+    } else return null;
+  };
+
+  const renderInput = () => {
+    // set left padding based on if an image model is being used
+    const leftPadding = isUsingImageModel() ? 'pl-11' : '';
+    return (
+      <div className="flex flex-col">
+        <SelectedImages 
+          selectedImages={selectedImages}
+          setSelectedImages={setSelectedImages}
+        />
+        <div className="relative w-full h-auto flex">
+          {renderImageSelection()}
+          <textarea
+            className={`w-full h-12 border-[1px] border-zinc-700 min-h-10 px-3 ${leftPadding} rounded-md bg-zinc-800 text-white outline-zinc-900 pt-[10px] pr-10`}
+            disabled={!currentModelName}
+            placeholder={`${
+              !currentModelName ? 'No model selected' : 'Type a message...'
+            }`}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={keyDown}
+          />
+          {pending && (
+            <BounceLoader
+              className="!absolute right-3 top-1/2 transform -translate-y-1/2"
+              size={20}
+              color="rgb(96 165 250)"
+            />
+          )}
+        </div>
       </div>
     );
   };

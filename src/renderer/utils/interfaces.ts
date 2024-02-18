@@ -2,6 +2,7 @@ export interface MESSAGE {
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
+  images?: SELECTED_IMAGE[];
 }
 
 export interface SETTINGS {
@@ -29,4 +30,9 @@ export interface MODEL {
   model: string;
   modified_at: string;
   size: number;
+}
+
+export interface SELECTED_IMAGE {
+  base64: string;
+  path: string;
 }

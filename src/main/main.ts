@@ -10,11 +10,12 @@
  */
 require('dotenv').config();
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+const fs = require('fs');
 
 class AppUpdater {
   constructor() {
@@ -31,6 +32,44 @@ ipcMain.on('ipc-example', async (event, arg) => {
   // console.log(msgTemplate(arg));
   // event.reply('ipc-example', msgTemplate('pong'));
 });
+
+ipcMain.on('select-image', async (event) => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }]
+  });
+
+  if (!result.canceled) {
+
+    const imagePath = result.filePaths[0];
+
+    // Read the image file
+    fs.readFile(imagePath, (err: any, data: any) => {
+      if (err) {
+        console.error('Error reading image file:', err);
+        return;
+      }
+
+      // Convert the image data to a base64 string
+      const base64Image = Buffer.from(data).toString('base64');
+
+      event.reply('image-selected', { base64: base64Image, path: imagePath });
+    });
+
+
+  }
+});
+
+// ipcMain.handle('select-image', async (event) => {
+//   const result = await dialog.showOpenDialog({
+//     properties: ['openFile'],
+//     filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }]
+//   })
+
+//   if (!result.canceled) {
+//     return result.filePaths[0]
+//   }
+// })
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
