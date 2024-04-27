@@ -3,6 +3,7 @@ import { User, Monitor } from 'react-feather';
 import ReactMarkdown from 'react-markdown';
 import { BeatLoader } from 'react-spinners';
 import { useState } from 'react';
+import MessageActions from './MessageActions';
 
 export default function MessageContainer(props: { message: MESSAGE }) {
   const { message } = props;
@@ -90,7 +91,10 @@ export default function MessageContainer(props: { message: MESSAGE }) {
       <div className="flex gap-3 items-start">
         {renderIcon()}
         <div className="flex flex-col pr-2 w-full">
-          <span className="font-bold capitalize">{message.role}</span>
+          <span className="font-bold capitalize flex items-center gap-3">
+            {message.role}
+            <MessageActions message={message}/>
+          </span>
           <div className="markdown-content">
             {messageLoadingLogic()}
           </div>

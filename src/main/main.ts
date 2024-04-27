@@ -15,6 +15,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { exec } from 'child_process';
 const fs = require('fs');
 
 class AppUpdater {
@@ -27,10 +28,49 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  // const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  // console.log(msgTemplate(arg));
-  // event.reply('ipc-example', msgTemplate('pong'));
+if (process.env.NODE_ENV === 'production') {
+  const sourceMapSupport = require('source-map-support');
+  sourceMapSupport.install();
+}
+
+const isDebug =
+  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+
+ipcMain.on('generate-audio', async (event, messageContent) => {
+  const path = require('path');
+  const tmpDir = require('os').tmpdir();
+
+  let piperPath = path.join(process.resourcesPath, 'piper', 'piper');
+  let model = path.join(process.resourcesPath, 'piper', 'en_GB-jenny_dioco-medium.onnx');
+  let output = path.join(tmpDir, 'output.wav');
+
+  if (isDebug) {
+    piperPath = path.resolve(__dirname, '../../piper/piper');
+    model = path.resolve(__dirname, '../../piper/en_GB-jenny_dioco-medium.onnx');
+    output = path.resolve(__dirname, '../../piper/output.wav');
+  }
+
+  const command = `echo "${messageContent}" | ${piperPath} --model ${model} --output_file ${output}`;
+  exec(command, (err, stdout, stderr) => {
+    if (err) {
+      console.error('Error generating audio:', err);
+      event.reply('generate-audio', 'Error generating audio');
+      event.reply('generate-audio', { base64: null });
+      return;
+    }
+    console.log(output);
+    // read the audio file
+    fs.readFile(output, (err: any, data: any) => {
+      if (err) {
+        console.error('Error reading audio file:', err);
+        event.reply('generate-audio', { base64: null });
+        return;
+      }
+      // convert the audio data to a base64 string
+      const base64Audio = Buffer.from(data).toString('base64');
+      event.reply('generate-audio', { base64: base64Audio });
+    });
+  });
 });
 
 ipcMain.on('select-image', async (event) => {
@@ -70,14 +110,6 @@ ipcMain.on('select-image', async (event) => {
 //     return result.filePaths[0]
 //   }
 // })
-
-if (process.env.NODE_ENV === 'production') {
-  const sourceMapSupport = require('source-map-support');
-  sourceMapSupport.install();
-}
-
-const isDebug =
-  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');

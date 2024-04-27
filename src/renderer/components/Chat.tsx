@@ -15,7 +15,7 @@ import {
   updateConversation,
 } from '../utils/managers/conversationManager';
 import { BounceLoader } from 'react-spinners';
-import { getSystemPrompt } from '../utils/utils';
+import { baseSystemPrompt, getSystemPrompt } from '../utils/utils';
 import { Image } from 'react-feather';
 import SelectedImages from './SelectedImages';
 let window: any = global;
@@ -34,6 +34,7 @@ export default function Chat() {
   const [selectedImages, setSelectedImages] = useState<SELECTED_IMAGE[]>([]);
 
   const messagesRef = useRef<MESSAGE[]>([]);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -98,6 +99,7 @@ export default function Chat() {
             chatType === 'chat' ? data.message.content : data.response;
           fullResponse += partialResponse;
           assistantResponse.content = fullResponse;
+          assistantResponse.streaming = !isDone;
           // replace the last message with the new message
           messagesRef.current[messagesRef.current.length - 1] =
             assistantResponse;
@@ -134,10 +136,10 @@ export default function Chat() {
             role: message.role,
             content: message.content,
             options: modelOptions,
-            template: getSystemPrompt(
-              currentModelName as string,
-              message.content,
-            ),
+            // template: getSystemPrompt(
+            //   currentModelName as string,
+            //   message.content,
+            // ),
             ...addSelectedImages(),
           };
         }),
@@ -147,7 +149,7 @@ export default function Chat() {
         model: currentModelName,
         prompt: userInput,
         options: modelOptions,
-        template: getSystemPrompt(currentModelName as string, userInput),
+        // template: getSystemPrompt(currentModelName as string, userInput),
         ...addSelectedImages(),
       };
     }
@@ -175,6 +177,16 @@ export default function Chat() {
         timestamp: Date.now(),
         images: selectedImages,
       };
+
+      // // add a system message if there are no messages
+      // if (messagesRef.current.length === 0) {
+      //   messagesRef.current.push({
+      //     role: 'system',
+      //     content: baseSystemPrompt,
+      //     timestamp: Date.now(),
+      //   });
+      // }
+
       // add the new message to the messages array
       messagesRef.current = [
         ...messagesRef.current,
@@ -227,14 +239,14 @@ export default function Chat() {
     // prompt the user to select an image from their computer
     const selectImage = async () => {
       // setup listener for a response from the main process
-      window.electron.ipcRenderer.once('image-selected', (newImageData: {
-        base64: string, 
-        path: string
-      }) => {
-        if (newImageData) {
-          setSelectedImages([...selectedImages, newImageData]);
-        }
-      });
+      window.electron.ipcRenderer.once(
+        'image-selected',
+        (newImageData: { base64: string; path: string }) => {
+          if (newImageData) {
+            setSelectedImages([...selectedImages, newImageData]);
+          }
+        },
+      );
 
       // send a message to the main process to open the file dialog
       await window.electron.ipcRenderer.sendMessage('select-image', [
@@ -262,7 +274,7 @@ export default function Chat() {
     const leftPadding = isUsingImageModel() ? 'pl-11' : '';
     return (
       <div className="flex flex-col">
-        <SelectedImages 
+        <SelectedImages
           selectedImages={selectedImages}
           setSelectedImages={setSelectedImages}
         />

@@ -1,7 +1,8 @@
 export interface MESSAGE {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: number;
+  streaming?: boolean;
   images?: SELECTED_IMAGE[];
 }
 

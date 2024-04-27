@@ -1,5 +1,5 @@
-const baseSystemPrompt =
-  "Your name is Blorg. You are Lorem's helpful AI assistant. Treat me like an expert, and please don't be too wordy with your responses";
+export const baseSystemPrompt =
+  "Your name is Alpha. You are Lorem's helpful AI assistant. Treat me like an expert, and please don't be too wordy with your responses";
 
 export const getSystemPrompt = (model: string, prompt: string) => {
   if (model in SYSTEM_PROMPTS) {

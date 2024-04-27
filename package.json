@@ -241,7 +241,11 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      {
+        "from": "./piper/",
+        "to": "piper"
+      }
     ],
     "publish": {
       "provider": "github",
