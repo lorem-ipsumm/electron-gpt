@@ -14,3 +14,31 @@ export const SYSTEM_PROMPTS = {
     `<|im_start|>system\n${baseSystemPrompt}<|im_end|>\n<|im_start|>user\n${prompt}<|im_end|>\n<|im_start|>assistant`,
   default: (message: string) => '{{ .System }}\nUSER: {{ .Prompt }}',
 };
+
+
+export const voices = [
+  {
+    name: "Alba",
+    file: "en_GB-alba-medium.onnx"
+  },
+  {
+    name: "Kristin",
+    file: "en_US-kristin-medium.onnx"
+  },
+  {
+    name: "Joe",
+    file: "en_US-joe-medium.onnx"
+  },
+  {
+    name: "Arctic",
+    file: "en_US-arctic-medium.onnx"
+  },
+  {
+    name: "Jenny",
+    file: "en_GB-jenny_dioco-medium.onnx"
+  },
+  {
+    name: "Cori",
+    file: "en_GB-cori-high.onnx"
+  }
+]

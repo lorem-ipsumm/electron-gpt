@@ -36,7 +36,8 @@ export const updateConversation = (uid: string, messages: MESSAGE[]) => {
 // create and store a new conversation in local storage
 export const createConversation = (
   messages: MESSAGE[], 
-  modelName: string
+  modelName: string,
+  isPrivate: boolean
 ):CONVERSATION => {
   const uid = Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
   const conversations = loadConversations();
@@ -46,8 +47,10 @@ export const createConversation = (
     timestamp: Date.now(),
     modelName: modelName
   };
-  conversations.push(conversation);
-  localStorage.setItem('conversations', JSON.stringify(conversations));
+  if (!isPrivate) {
+    conversations.push(conversation);
+    localStorage.setItem('conversations', JSON.stringify(conversations));
+  }
   return conversation;
 };
 

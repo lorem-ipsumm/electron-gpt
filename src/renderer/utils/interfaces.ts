@@ -37,3 +37,8 @@ export interface SELECTED_IMAGE {
   base64: string;
   path: string;
 }
+
+export interface VOICE {
+  name: string;
+  file: string;
+}

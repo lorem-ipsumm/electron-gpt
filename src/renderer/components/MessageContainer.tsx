@@ -88,15 +88,15 @@ export default function MessageContainer(props: { message: MESSAGE }) {
 
   const renderMessage = () => {
     return (
-      <div className="flex gap-3 items-start">
+      <div className="flex gap-3 items-start relative mb-3">
         {renderIcon()}
         <div className="flex flex-col pr-2 w-full">
           <span className="font-bold capitalize flex items-center gap-3">
             {message.role}
-            <MessageActions message={message}/>
           </span>
           <div className="markdown-content">
             {messageLoadingLogic()}
+            <MessageActions message={message}/>
           </div>
           {renderAttachedImages()}
         </div>

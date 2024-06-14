@@ -36,19 +36,23 @@ if (process.env.NODE_ENV === 'production') {
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-ipcMain.on('generate-audio', async (event, messageContent) => {
+ipcMain.on('generate-audio', async (event, {content, voice}) => {
   const path = require('path');
   const tmpDir = require('os').tmpdir();
 
   let piperPath = path.join(process.resourcesPath, 'piper', 'piper');
-  let model = path.join(process.resourcesPath, 'piper', 'en_GB-jenny_dioco-medium.onnx');
+  let model = path.join(process.resourcesPath, 'piper', `${voice}`);
   let output = path.join(tmpDir, 'output.wav');
 
   if (isDebug) {
     piperPath = path.resolve(__dirname, '../../piper/piper');
-    model = path.resolve(__dirname, '../../piper/en_GB-jenny_dioco-medium.onnx');
-    output = path.resolve(__dirname, '../../piper/output.wav');
+    model = path.resolve(__dirname, `../../piper/${voice}`);
   }
+
+  // sanitize the message content
+  // remove asterisks from the message content
+  const messageContent = content.replace(/\*/g, '');
+  // messageContent = messageContent.replace(/'/g, "\\'").replace(/"/g, '\\"');
 
   const command = `echo "${messageContent}" | ${piperPath} --model ${model} --output_file ${output}`;
   exec(command, (err, stdout, stderr) => {
@@ -58,7 +62,6 @@ ipcMain.on('generate-audio', async (event, messageContent) => {
       event.reply('generate-audio', { base64: null });
       return;
     }
-    console.log(output);
     // read the audio file
     fs.readFile(output, (err: any, data: any) => {
       if (err) {

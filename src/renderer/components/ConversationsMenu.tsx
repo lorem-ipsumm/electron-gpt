@@ -100,6 +100,7 @@ export default function ConversationsMenu() {
             <div
               className={`${isActiveStyle} flex justify-between w-full h-10 cursor-pointer items-center hover:bg-zinc-900 transition all rounded-md overflow-hidden`}
               onClick={() => conversationClicked(conversation)}
+              key={conversation.uid}
             >
               <span className="block h-full flex-1 text-white text-nowrap flex items-center px-2">
                 {title}

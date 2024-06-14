@@ -7,7 +7,9 @@ import {
   chatTypeAtom,
   currentConversationAtom,
   currentModelNameAtom,
+  messagesAtom,
   modelOptionsAtom,
+  privateModeAtom,
 } from '../utils/atoms';
 import { useInterval } from 'usehooks-ts';
 import {
@@ -30,6 +32,7 @@ export default function Chat() {
 
   const [input, setInput] = useState<string>('');
   const [pending, setPending] = useState<boolean>(false);
+  const [privateMode] = useAtom(privateModeAtom);
   const [_, forceUpdate] = useState<number>(0);
   const [selectedImages, setSelectedImages] = useState<SELECTED_IMAGE[]>([]);
 
@@ -178,15 +181,6 @@ export default function Chat() {
         images: selectedImages,
       };
 
-      // // add a system message if there are no messages
-      // if (messagesRef.current.length === 0) {
-      //   messagesRef.current.push({
-      //     role: 'system',
-      //     content: baseSystemPrompt,
-      //     timestamp: Date.now(),
-      //   });
-      // }
-
       // add the new message to the messages array
       messagesRef.current = [
         ...messagesRef.current,
@@ -203,6 +197,7 @@ export default function Chat() {
         const newConversation = createConversation(
           messagesRef.current,
           currentModelName as string,
+          privateMode 
         );
         setCurrentConversation(newConversation);
         conversationUid = newConversation.uid;
@@ -213,8 +208,10 @@ export default function Chat() {
       const response = await formatRequest();
       // stream the response
       await streamResponse(response);
-      // update the conversation local storage
-      updateConversation(conversationUid as string, messagesRef.current);
+      if (!privateMode) {
+        // update the conversation local storage
+        updateConversation(conversationUid as string, messagesRef.current);
+      }
     } catch (e) {
       console.log(e);
     }
@@ -232,7 +229,11 @@ export default function Chat() {
   };
 
   const isUsingImageModel = () => {
-    return currentModelName === 'llava:latest';
+    const imageModels = [
+      "llava:latest",
+      "moondream:latest"
+    ]
+    return imageModels.includes(currentModelName as string);
   };
 
   const renderImageSelection = () => {

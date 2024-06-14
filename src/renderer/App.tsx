@@ -6,14 +6,14 @@ import { useAtom } from 'jotai';
 import {
   currentConversationAtom,
   currentModelNameAtom,
-  modelOptionsAtom,
+  privateModeAtom,
 } from './utils/atoms';
 import { loadSettings, updateSettings } from './utils/managers/settingsManager';
-import { SETTINGS } from './utils/interfaces';
 
 export default function App() {
   const [currentModelName] = useAtom(currentModelNameAtom);
   const [currentConversation] = useAtom(currentConversationAtom);
+  const [privateMode] = useAtom(privateModeAtom);
 
   useEffect(() => {
     const refresh = (e: KeyboardEvent) => {
@@ -34,8 +34,10 @@ export default function App() {
     let newSettings: any = {
       ...settings,
     };
-    if (currentModelName) newSettings.lastModelName = currentModelName;
-    if (currentConversation) newSettings.lastConversation = currentConversation;
+    if (!privateMode) {
+      if (currentModelName) newSettings.lastModelName = currentModelName;
+      if (currentConversation) newSettings.lastConversation = currentConversation;
+    }
     updateSettings(newSettings);
   }, [currentModelName, currentConversation]);
 

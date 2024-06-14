@@ -1,15 +1,31 @@
 import { useAtom } from 'jotai';
 import {
+  autoReadAtom,
   chatTypeAtom,
+  currentVoiceAtom,
   isSettingsMenuOpenAtom,
   modelOptionsAtom,
+  privateModeAtom,
 } from '../utils/atoms';
 import { X } from 'react-feather';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { VOICE } from '../utils/interfaces';
+import { voices } from '../utils/utils';
 
 export default function SettingsMenu() {
   const [chatType, setChatType] = useAtom(chatTypeAtom);
+  const [, setAutoRead] = useAtom(autoReadAtom);
+  const [, setPrivateMode] = useAtom(privateModeAtom);
+  const [currentVoice, setCurrentVoice] = useAtom(currentVoiceAtom);
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useAtom(
     isSettingsMenuOpenAtom,
   );
@@ -97,6 +113,93 @@ export default function SettingsMenu() {
     );
   };
 
+  const renderVoiceSelection = () => {
+    const renderOption = (voice: VOICE) => {
+      return (
+        <DropdownMenuItem
+          className="w-full cursor-pointer w-[200px] color-white"
+          onClick={() => setCurrentVoice(voice)}
+        >
+          {voice.name}
+        </DropdownMenuItem>
+      );
+    };
+
+    return (
+      <div className="w-full relative">
+        <span className="block text-white text-sm font-bold mb-2 text-nowrap">
+          Voice
+        </span>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="text-white w-full text-left bg-zinc-800 h-10 px-3 rounded-md hover:bg-zinc-900">
+            {currentVoice.name}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-full dark relative">
+            <DropdownMenuRadioGroup className="w-full">
+              {voices.map((voice: VOICE) => renderOption(voice))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    );
+  };
+
+  const renderAutoRead = () => {
+    return (
+      <div className="w-full">
+        <span className="block text-white text-sm font-bold mb-2 text-nowrap">
+          Auto Read
+        </span>
+        <Tabs defaultValue={'On'} className="w-full dark h-8">
+          <TabsList className="w-full">
+            <TabsTrigger
+              value="On"
+              onClick={() => setAutoRead(true)}
+              className="w-1/2"
+            >
+              On
+            </TabsTrigger>
+            <TabsTrigger
+              value="Off"
+              onClick={() => setAutoRead(false)}
+              className="w-1/2"
+            >
+              Off
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    );
+  };
+
+  const renderPrivateMode = () => {
+    return (
+      <div className="w-full">
+        <span className="block text-white text-sm font-bold mb-2 text-nowrap">
+          Private Mode 
+        </span>
+        <Tabs defaultValue={'Off'} className="w-full dark h-8">
+          <TabsList className="w-full">
+            <TabsTrigger
+              value="On"
+              onClick={() => setPrivateMode(true)}
+              className="w-1/2"
+            >
+              On
+            </TabsTrigger>
+            <TabsTrigger
+              value="Off"
+              onClick={() => setPrivateMode(false)}
+              className="w-1/2"
+            >
+              Off
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    );
+  };
+
   const getMenuSize = () => {
     if (isSettingsMenuOpen) {
       return 'w-1/2 md:w-1/4 px-3';
@@ -116,6 +219,9 @@ export default function SettingsMenu() {
           size={15}
         />
         {renderChatType()}
+        {renderAutoRead()}
+        {renderPrivateMode()}
+        {renderVoiceSelection()}
         {renderSliders()}
       </div>
     </>
