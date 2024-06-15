@@ -112,19 +112,13 @@ const MessageActions = ({ message }: Props) => {
 
   const shouldShowRefresh = () => {
     return message.role === 'user';
-  }
+  };
 
   const renderRefreshIcon = () => {
     if (!shouldShowRefresh()) return null;
     const iconStyle =
       'text-white z-1 hover:text-blue-500 cursor-pointer transition';
-    return (
-      <RefreshCcw 
-        className={iconStyle} 
-        size={13} 
-        onClick={() => {}} 
-      />
-    )
+    return <RefreshCcw className={iconStyle} size={13} onClick={() => {}} />;
   };
 
   return (

@@ -219,7 +219,11 @@ export default function Chat() {
   };
 
   const keyDown = (e: any) => {
-    if (e.key === 'Enter' && !pending) {
+    if (e.key === 'Enter' && e.shiftKey) {
+      // add a new line when shift + enter is pressed
+      e.preventDefault();
+      setInput((prev) => `${prev}\n`);
+    } else if (e.key === 'Enter' && !pending) {
       e.preventDefault();
       sendMessage();
       setTimeout(() => {
