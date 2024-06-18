@@ -27,6 +27,6 @@ const electronHandler = {
 contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('envVars', {
   OLLAMA_SERVER_ADDRESS: process.env.OLLAMA_SERVER_ADDRESS,
-})
+});
 
 export type ElectronHandler = typeof electronHandler;

@@ -197,7 +197,7 @@ export default function Chat() {
         const newConversation = createConversation(
           messagesRef.current,
           currentModelName as string,
-          privateMode 
+          privateMode,
         );
         setCurrentConversation(newConversation);
         conversationUid = newConversation.uid;
@@ -233,10 +233,7 @@ export default function Chat() {
   };
 
   const isUsingImageModel = () => {
-    const imageModels = [
-      "llava:latest",
-      "moondream:latest"
-    ]
+    const imageModels = ['llava:latest', 'moondream:latest'];
     return imageModels.includes(currentModelName as string);
   };
 

@@ -42,7 +42,7 @@ export default function MessageContainer(props: { message: MESSAGE }) {
 
   const renderAttachedImages = () => {
     // if there are no images attached to the message return null
-    if (!message.images || message.images.length === 0) return null
+    if (!message.images || message.images.length === 0) return null;
     return (
       <div className="min-w-full flex gap-2 justify-start overflow-x-auto">
         {message.images.map((image, index) => {
@@ -58,33 +58,28 @@ export default function MessageContainer(props: { message: MESSAGE }) {
         })}
       </div>
     );
-  }
+  };
 
   // render a full screen view of the selected image
   const renderFullScreenImage = () => {
     // check if there is an image selected
-    if (
-      selectedImage === -1 ||
-      !message.images
-    ) return null
+    if (selectedImage === -1 || !message.images) return null;
     return (
-      <div 
+      <div
         className="fixed left-0 top-0 w-full h-full flex justify-center items-center z-10 fade-in"
         onClick={() => {
           setSelectedImage(-1);
         }}
       >
-        <div
-          className="fixed left-0 top-0 w-full h-full bg-black opacity-90 z-[-1]"
-        />
+        <div className="fixed left-0 top-0 w-full h-full bg-black opacity-90 z-[-1]" />
         <img
           src={`data:image/jpeg;base64,${message.images[selectedImage].base64}`}
           alt="full screen image"
           className="w-[90%] h-auto object-cover"
         />
       </div>
-    )
-  }
+    );
+  };
 
   const renderMessage = () => {
     return (
@@ -96,7 +91,7 @@ export default function MessageContainer(props: { message: MESSAGE }) {
           </span>
           <div className="markdown-content">
             {messageLoadingLogic()}
-            <MessageActions message={message}/>
+            <MessageActions message={message} />
           </div>
           {renderAttachedImages()}
         </div>

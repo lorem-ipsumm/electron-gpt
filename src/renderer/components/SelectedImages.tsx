@@ -10,7 +10,6 @@ export default function SelectedImages({
   selectedImages,
   setSelectedImages,
 }: SelectedImagesProps) {
-
   // ist the image selection hidden or not
   const isHidden = selectedImages.length === 0 ? 'hidden' : 'flex';
 
@@ -18,7 +17,7 @@ export default function SelectedImages({
   const removeSelectedImage = (index: number) => {
     const newImages = selectedImages.filter((_, i) => i !== index);
     setSelectedImages(newImages);
-  }
+  };
 
   // render the images passed in
   const renderImagePreviews = () => {
@@ -31,9 +30,7 @@ export default function SelectedImages({
             alt="selected image"
             className="w-full h-full object-cover rounded-md"
           />
-          <div
-            className="absolute top-0 right-0 m-[5px] cursor-pointer shadow-lg bg-zinc-900 rounded-full w-4 h-4 flex items-center justify-center"
-          >
+          <div className="absolute top-0 right-0 m-[5px] cursor-pointer shadow-lg bg-zinc-900 rounded-full w-4 h-4 flex items-center justify-center">
             <X
               onClick={() => removeSelectedImage(index)}
               size={10}

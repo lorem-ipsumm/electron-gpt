@@ -36,7 +36,7 @@ if (process.env.NODE_ENV === 'production') {
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-ipcMain.on('generate-audio', async (event, {content, voice}) => {
+ipcMain.on('generate-audio', async (event, { content, voice }) => {
   const path = require('path');
   const tmpDir = require('os').tmpdir();
 
@@ -79,11 +79,10 @@ ipcMain.on('generate-audio', async (event, {content, voice}) => {
 ipcMain.on('select-image', async (event) => {
   const result = await dialog.showOpenDialog({
     properties: ['openFile'],
-    filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }]
+    filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }],
   });
 
   if (!result.canceled) {
-
     const imagePath = result.filePaths[0];
 
     // Read the image file
@@ -98,8 +97,6 @@ ipcMain.on('select-image', async (event) => {
 
       event.reply('image-selected', { base64: base64Image, path: imagePath });
     });
-
-
   }
 });
 

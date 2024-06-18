@@ -176,7 +176,7 @@ export default function SettingsMenu() {
     return (
       <div className="w-full">
         <span className="block text-white text-sm font-bold mb-2 text-nowrap">
-          Private Mode 
+          Private Mode
         </span>
         <Tabs defaultValue={'Off'} className="w-full dark h-8">
           <TabsList className="w-full">
